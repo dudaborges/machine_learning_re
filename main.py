@@ -1,39 +1,37 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from scipy.stats import pearsonr
-import numpy as np
-
+from sklearn import linear_model
 
 dados = pd.read_csv('sheet3.csv')
 X = dados["Po"]
 Y = dados["Agua"]
 
-# gráfico de dispersão
-plt.scatter(X, Y)
-plt.title("Água vs Suco em Pó")
-plt.xlabel("Suco em Pó (Mg)")
-plt.ylabel("Água (Ml)")
-plt.show()
+reg = linear_model.LinearRegression()
+reg.fit(X.values.reshape(-1, 1), Y)
 
-# calcula o coeficiente de correlação
-r = pearsonr(X, Y)
-print(r)
+A = reg.coef_
+B = reg.intercept_
+print(f"Coeficiente intercepto: {float(A)}")
+print(f"Coeficiente angular: {float(B)}") 
 
-# separa os dados de treino e de teste (70% e 30%, respectivamente)
-x_train, x_test, y_train, y_test = train_test_split( X, Y, test_size=0.3)
+def scatter_chart():
+    plt.scatter(X, Y)
+    plt.title("Água vs Suco em Pó")
+    plt.xlabel("Suco em Pó (Mg)")
+    plt.ylabel("Água (Ml)")
+    x0 = dados["Po"][0]
+    y0 = dados["Agua"][0]
+    x1 = dados["Po"][3]
+    y1 = dados["Agua"][3]
+    plt.plot([x0, x1], [y0, y1], "r")
+    plt.show()
 
-# redimensiona os dados em arrays bidimensionais
-x_train = x_train.reshape(-1,1)
-y_train = y_train.reshape(-1,1)
-x_test = x_test.reshape(-1,1)
-y_test = y_test.reshape(-1,1)
+scatter_chart()
+def predict_value_x(Y):
+    X = (Y - B) / A
+    print(f"X é {float(X)}, se Y for {Y}")
 
-# treina o modelo
-line = LinearRegression()
-line.fit(x_train, y_train)
-line_pred = line.predict(x_test)
-
-# calcula o coeficiente r2
-
+predict_value_x(300)
+def predict_value_y(X):
+    Y = A * X + B
+    print(f"Y é {float(Y)}, se X for {X}")
